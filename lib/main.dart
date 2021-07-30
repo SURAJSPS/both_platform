@@ -1,6 +1,7 @@
 import 'package:both_platform/auth/login.dart';
 // ignore: unused_import
 import 'package:both_platform/auth/signup.dart';
+import 'package:both_platform/my_home_page.dart';
 import 'package:both_platform/second_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget {
         buttonTheme: ButtonThemeData(),
         primarySwatch: Colors.blue,
       ),
-      home: SecondPage(),
+      home: LogIn(),
     );
   }
 }

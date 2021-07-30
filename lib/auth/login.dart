@@ -5,6 +5,8 @@ import 'package:both_platform/my_home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({Key? key}) : super(key: key);
@@ -23,6 +25,49 @@ String? _userPass = '';
 GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class _LogInState extends State<LogIn> {
+  @override
+  void initState() {
+    getLocationLocate();
+    super.initState();
+  }
+
+  var currentLatlong;
+
+  getLocationLocate() async {
+    Position _position = await _determinePosition();
+
+    setState(() {
+      currentLatlong = LatLng(_position.latitude, _position.longitude);
+      print(currentLatlong);
+    });
+  }
+
+// Location permissions
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    return await Geolocator.getCurrentPosition();
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -79,7 +124,7 @@ class _LogInState extends State<LogIn> {
                       if (isValid != null) {
                         if (isValid) {
                           _formKey.currentState?.save();
-                          _loginButton(context);
+                          _loginButton(context, currentLatlong);
                           // Use those value to send our auth request for signup..........
                         }
                       }
@@ -183,7 +228,7 @@ Widget _password() {
 }
 
 /// Login Onpress work
-_loginButton(context) async {
+_loginButton(context, currentLatlong) async {
   // ignore: await_only_futures
   await DatabaseHelper.instance;
 
@@ -198,7 +243,10 @@ _loginButton(context) async {
   await DatabaseHelper.instance.insertUser(_model).then(
         (value) => Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
+            MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                      currentLatlong: currentLatlong,
+                    )),
             (route) => false),
       );
 }

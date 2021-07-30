@@ -1,68 +1,26 @@
-import 'dart:async';
 
 import 'package:both_platform/second_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+  var currentLatlong;
+  MyHomePage({Key? key,  this.currentLatlong}) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  var currentLatlong;
-
-  @override
-  void initState() {
-    getLocationLocate();
-    super.initState();
-  }
-
-  getLocationLocate() async {
-    Position _position = await _determinePosition();
-
-    setState(() {
-      currentLatlong = new LatLng(_position.latitude, _position.longitude);
-    });
-  }
-// Location permissions 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    return await Geolocator.getCurrentPosition();
-  }
-
-  
-// Use for the marker 
+// Use for the marker
   Set<Marker> _marker = {};
   void _onMapCreated(GoogleMapController controller) {
     setState(() {
       _marker.add(Marker(
           markerId: MarkerId('Id_0'),
-          position: currentLatlong,
+          position: widget.currentLatlong,
           infoWindow: InfoWindow(title: "Your location")));
     });
   }
@@ -77,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
             onMapCreated: _onMapCreated,
             markers: _marker,
             initialCameraPosition: CameraPosition(
-              target: currentLatlong,
+              target: widget.currentLatlong,
               zoom: 11.0,
             ),
           ),
