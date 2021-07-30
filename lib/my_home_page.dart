@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/second_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class MyHomePage extends StatefulWidget {
   var currentLatlong;
   List? userDetails;
-  MyHomePage({Key? key, @required this.currentLatlong, this.userDetails})
+  MyHomePage({Key? key, this.currentLatlong, this.userDetails})
       : super(key: key);
 
   @override

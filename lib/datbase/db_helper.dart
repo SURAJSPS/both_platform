@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:both_platform/datbase/data_model.dart';
@@ -50,7 +49,6 @@ class DatabaseHelper {
   }
 
   Future isUser(String email, String password) async {
-    bool status = false;
     final db = await database;
     await db!.query("User",
         where: 'email=? AND password=?', whereArgs: [email, password]);
@@ -73,8 +71,6 @@ class DatabaseHelper {
     await db!.query("User",
         where: 'email=? AND password=?', whereArgs: [email, password]);
     print("usermatch");
-    List usermatch = await db.query("User",
-        where: 'email=? AND password=?', whereArgs: [email, password]);
   }
 }
 

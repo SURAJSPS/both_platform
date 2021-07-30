@@ -63,6 +63,8 @@ Widget getFutureBilder() {
                       ),
                       child: Image.network(
                         "${PicsumUtil.picsumList[index].downloadUrl}",
+                        height: 200,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     Padding(

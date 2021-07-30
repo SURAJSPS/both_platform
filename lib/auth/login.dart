@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:both_platform/auth/signup.dart';
 import 'package:both_platform/datbase/db_helper.dart';
 import 'package:both_platform/my_home_page.dart';
@@ -8,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({Key? key}) : super(key: key);
@@ -19,7 +16,6 @@ class LogIn extends StatefulWidget {
 
 final emailController = TextEditingController();
 final passwordController = TextEditingController();
-Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
 // ignore: unused_element
 String? _userEmail = '';
@@ -73,7 +69,6 @@ class _LogInState extends State<LogIn> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.blue,
       body: ListView(
@@ -81,11 +76,11 @@ class _LogInState extends State<LogIn> {
           Form(
             key: _formKey,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Column(
                 children: [
                   SizedBox(
-                    height: 30,
+                    height: 50,
                   ),
                   Text(
                     'Login',
@@ -155,7 +150,9 @@ class _LogInState extends State<LogIn> {
                             ..onTap = () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => Register(),
+                                  builder: (context) => Register(
+                                    currentLatlong: currentLatlong,
+                                  ),
                                 ),
                               );
                               // print('Register Button');
@@ -232,19 +229,12 @@ Widget _password() {
 
 /// Login Onpress work
 _loginButton(context, currentLatlong) async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-
   List userDetails = await DatabaseHelper.instance
       .isUser(emailController.text, passwordController.text);
-  emailController.clear();
-  passwordController.clear();
-  emailController.clear();
-
   print(userDetails);
 
   if (userDetails.isEmpty) {
   } else {
-    // prefs.setStringList('email', data);
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(

@@ -1,10 +1,8 @@
 import 'dart:io';
 
-import 'package:both_platform/auth/login.dart';
 import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/datbase/db_helper.dart';
 
-import 'package:both_platform/my_home_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -231,7 +229,7 @@ Widget _userName() {
           }
         }
       },
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.name,
       decoration: InputDecoration.collapsed(
         hintText: 'Enter your  Full Name',
         border: InputBorder.none,
@@ -261,7 +259,7 @@ Widget _phoneNumber() {
           }
         }
       },
-      keyboardType: TextInputType.emailAddress,
+      keyboardType: TextInputType.phone,
       decoration: InputDecoration.collapsed(
         hintText: 'Enter your  Phone Number',
         border: InputBorder.none,
