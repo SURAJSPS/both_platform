@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:both_platform/auth/login.dart';
 import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/datbase/db_helper.dart';
 
@@ -29,7 +30,7 @@ String? _userEmail = '';
 String? _userNam = '';
 // ignore: unused_element
 String? _userPhone = '';
-
+File? _image;
 // ignore: unused_element
 String? _userPassword = '';
 // ignore: unused_element
@@ -38,25 +39,19 @@ String? _userConformPassword = '';
 GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class _RegisterState extends State<Register> {
-  PickedFile? _image;
+  File? _image;
+  final picker = ImagePicker();
+
+  get image => null;
 
   _imgFromCamera() async {
-    PickedFile? image =
-        // ignore: invalid_use_of_visible_for_testing_member
-        await ImagePicker.platform.pickImage(source: ImageSource.camera);
-
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
     setState(() {
-      _image = image;
-    });
-  }
-
-  _imgFromGallery() async {
-    PickedFile? image =
-        // ignore: invalid_use_of_visible_for_testing_member
-        await ImagePicker.platform.pickImage(source: ImageSource.gallery);
-
-    setState(() {
-      _image = image;
+      if (pickedFile != null) {
+        _image = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
     });
   }
 
@@ -141,19 +136,6 @@ class _RegisterState extends State<Register> {
                 SizedBox(
                   height: 30,
                 ),
-                Container(
-                  height: 50,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 0),
-                  child: _confPassword(),
-                ),
-                SizedBox(
-                  height: 30,
-                ),
                 CupertinoButton(
                   onPressed: () {
                     final isValid = _formKey.currentState?.validate();
@@ -187,21 +169,12 @@ class _RegisterState extends State<Register> {
         builder: (BuildContext bc) {
           return SafeArea(
             child: Container(
-              child: new Wrap(
+              child: Wrap(
                 children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Photo Library'),
-                      onTap: () {
-                        print('gallary');
-                        _imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text('Camera'),
                     onTap: () {
-                      print('Camera');
                       _imgFromCamera();
                       Navigator.of(context).pop();
                     },
@@ -326,35 +299,6 @@ Widget _password() {
   );
 }
 
-// conform password widget
-Widget _confPassword() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 10),
-    child: TextFormField(
-      textAlign: TextAlign.center,
-      controller: confPasswordController,
-      key: ValueKey('conformPassword'),
-      validator: (value) {
-        if (value != null) {
-          if (value.isEmpty || value.length < 4) {
-            return "Your password should not match";
-          }
-        }
-        return null;
-      },
-      onSaved: (value) {
-        _userConformPassword = value;
-      },
-      obscureText: true,
-      keyboardType: TextInputType.visiblePassword,
-      decoration: InputDecoration.collapsed(
-        hintText: 'Enter Conform Password',
-        border: InputBorder.none,
-      ),
-    ),
-  );
-}
-
 /// creat account button
 _creatAccount(context, currentLatlong) async {
   // ignore: await_only_futures
@@ -363,20 +307,28 @@ _creatAccount(context, currentLatlong) async {
   UserDataModel _model = UserDataModel(
     email: emailController.text,
     password: passwordController.text,
-    image: confPasswordController.text,
+    image: _image.toString(),
     name: nameController.text,
     phone: phoneController.text,
   );
+  emailController.clear();
+  passwordController.clear();
+  emailController.clear();
 
-  await DatabaseHelper.instance.insertUser(_model).then(
-        (value) => Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MyHomePage(
-                      currentLatlong: currentLatlong,
-                    )),
-            (route) => false),
-      );
+  nameController.clear();
+  phoneController.clear();
+  await DatabaseHelper.instance
+      .insertUser(_model)
+      .then((value) => Navigator.pop(context));
+  final snackBar = SnackBar(
+    content: const Text('Register Succesfully '),
+    action: SnackBarAction(
+      label: 'Undo',
+      onPressed: () {},
+    ),
+  );
+
+  ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
 Widget getImage(context, _image, _showPicker) {

@@ -1,5 +1,6 @@
+import 'dart:convert';
+
 import 'package:both_platform/auth/signup.dart';
-import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/datbase/db_helper.dart';
 import 'package:both_platform/my_home_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogIn extends StatefulWidget {
   const LogIn({Key? key}) : super(key: key);
@@ -17,6 +19,7 @@ class LogIn extends StatefulWidget {
 
 final emailController = TextEditingController();
 final passwordController = TextEditingController();
+Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
 // ignore: unused_element
 String? _userEmail = '';
@@ -152,9 +155,7 @@ class _LogInState extends State<LogIn> {
                             ..onTap = () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => Register(
-                                    currentLatlong: currentLatlong,
-                                  ),
+                                  builder: (context) => Register(),
                                 ),
                               );
                               // print('Register Button');
@@ -231,28 +232,26 @@ Widget _password() {
 
 /// Login Onpress work
 _loginButton(context, currentLatlong) async {
-  // ignore: await_only_futures
-  // await DatabaseHelper.instance;
+  SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  // // UserDataModel _model = UserDataModel(
-  // //   email: emailController.text,
-  // //   password: passwordController.text,
-  // //   image: confPasswordController.text,
-  // //   name: nameController.text,
-  // //   phone: phoneController.text,
-  // // );
-
-  bool Status = await DatabaseHelper.instance
+  List userDetails = await DatabaseHelper.instance
       .isUser(emailController.text, passwordController.text);
-  print(Status);
+  emailController.clear();
+  passwordController.clear();
+  emailController.clear();
 
-  if (Status == true) {
+  print(userDetails);
+
+  if (userDetails.isEmpty) {
+  } else {
+    // prefs.setStringList('email', data);
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
             builder: (context) => MyHomePage(
                   currentLatlong: currentLatlong,
+                  userDetails: userDetails,
                 )),
         (route) => false);
-  } else {}
+  }
 }

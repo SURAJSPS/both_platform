@@ -1,6 +1,4 @@
 import 'package:both_platform/auth/login.dart';
-// ignore: unused_import
-import 'package:both_platform/auth/signup.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // ignore: unused_import

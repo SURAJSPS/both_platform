@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/second_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,17 +9,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 // ignore: must_be_immutable
 class MyHomePage extends StatefulWidget {
   var currentLatlong;
-  // UserDataModel? userDataModel;
-  MyHomePage({
-    Key? key,
-    @required this.currentLatlong,
-  }) : super(key: key);
+  List? userDetails;
+  MyHomePage({Key? key, @required this.currentLatlong, this.userDetails})
+      : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  File? _file;
+
 // Use for the marker
   Set<Marker> _marker = {};
   void _onMapCreated(GoogleMapController controller) {
@@ -37,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Stack(
           children: [
             GoogleMap(
+              compassEnabled: true,
               zoomControlsEnabled: false,
               zoomGesturesEnabled: false,
               onMapCreated: _onMapCreated,
@@ -47,18 +50,21 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Container(
-              color: Colors.amber[50],
-              alignment: Alignment.bottomRight,
+              alignment: Alignment.center,
               height: MediaQuery.of(context).size.height / 8.99,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  CircleAvatar(
-                    radius: 20,
-                  ),
+                  (_file != null)
+                      ? CircleAvatar(
+                          backgroundImage: FileImage(
+                              _file = (widget.userDetails![0]['image']).path),
+                          radius: 20,
+                        )
+                      : CircleAvatar(),
                   Text(
-                    "{widget.userDataModel!.name}",
+                    "${widget.userDetails![0]['name']}",
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],

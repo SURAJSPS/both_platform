@@ -58,15 +58,14 @@ class DatabaseHelper {
     List usermatch = await db.query("User",
         where: 'email=? AND password=?', whereArgs: [email, password]);
     if (usermatch.length > 0) {
-      print("${usermatch[0].runtimeType}");
+      print("${usermatch.toString()}");
 
-       status = true;
-
+      return usermatch;
     } else {
       print("User Not match");
-      status = false;
+      return [];
+      
     }
-    return status;
   }
 
   Future isUserGetData(String email, String password) async {
