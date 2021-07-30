@@ -152,7 +152,9 @@ class _LogInState extends State<LogIn> {
                             ..onTap = () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => Register(),
+                                  builder: (context) => Register(
+                                    currentLatlong: currentLatlong,
+                                  ),
                                 ),
                               );
                               // print('Register Button');
@@ -230,23 +232,27 @@ Widget _password() {
 /// Login Onpress work
 _loginButton(context, currentLatlong) async {
   // ignore: await_only_futures
-  await DatabaseHelper.instance;
+  // await DatabaseHelper.instance;
 
-  UserDataModel _model = UserDataModel(
-    email: emailController.text,
-    password: passwordController.text,
-    image: confPasswordController.text,
-    name: nameController.text,
-    phone: phoneController.text,
-  );
+  // // UserDataModel _model = UserDataModel(
+  // //   email: emailController.text,
+  // //   password: passwordController.text,
+  // //   image: confPasswordController.text,
+  // //   name: nameController.text,
+  // //   phone: phoneController.text,
+  // // );
 
-  await DatabaseHelper.instance.insertUser(_model).then(
-        (value) => Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MyHomePage(
-                      currentLatlong: currentLatlong,
-                    )),
-            (route) => false),
-      );
+  bool Status = await DatabaseHelper.instance
+      .isUser(emailController.text, passwordController.text);
+  print(Status);
+
+  if (Status == true) {
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MyHomePage(
+                  currentLatlong: currentLatlong,
+                )),
+        (route) => false);
+  } else {}
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:both_platform/datbase/data_model.dart';
 import 'package:both_platform/datbase/db_helper.dart';
 
@@ -6,8 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+// ignore: must_be_immutable
 class Register extends StatefulWidget {
-  // const Register({Key? key}) : super(key: key);
+  var currentLatlong;
+  Register({Key? key, this.currentLatlong}) : super(key: key);
 
   @override
   _RegisterState createState() => _RegisterState();
@@ -34,12 +38,12 @@ String? _userConformPassword = '';
 GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
 class _RegisterState extends State<Register> {
-  XFile? _image;
+  PickedFile? _image;
 
   _imgFromCamera() async {
-    XFile? image =
+    PickedFile? image =
         // ignore: invalid_use_of_visible_for_testing_member
-        await ImagePicker.platform.getImage(source: ImageSource.camera);
+        await ImagePicker.platform.pickImage(source: ImageSource.camera);
 
     setState(() {
       _image = image;
@@ -47,9 +51,9 @@ class _RegisterState extends State<Register> {
   }
 
   _imgFromGallery() async {
-    XFile? image =
+    PickedFile? image =
         // ignore: invalid_use_of_visible_for_testing_member
-        await ImagePicker.platform.getImage(source: ImageSource.gallery);
+        await ImagePicker.platform.pickImage(source: ImageSource.gallery);
 
     setState(() {
       _image = image;
@@ -157,7 +161,7 @@ class _RegisterState extends State<Register> {
                     if (isValid != null) {
                       if (isValid) {
                         _formKey.currentState?.save();
-                        _creatAccount(context);
+                        _creatAccount(context, widget.currentLatlong);
 
                         // Use those value to send our auth request for signup..........
                       }
@@ -352,7 +356,7 @@ Widget _confPassword() {
 }
 
 /// creat account button
-_creatAccount(context) async {
+_creatAccount(context, currentLatlong) async {
   // ignore: await_only_futures
   await DatabaseHelper.instance;
 
@@ -367,7 +371,10 @@ _creatAccount(context) async {
   await DatabaseHelper.instance.insertUser(_model).then(
         (value) => Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
+            MaterialPageRoute(
+                builder: (context) => MyHomePage(
+                      currentLatlong: currentLatlong,
+                    )),
             (route) => false),
       );
 }

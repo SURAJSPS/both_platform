@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:both_platform/datbase/data_model.dart';
@@ -42,16 +43,67 @@ class DatabaseHelper {
       userDataModel.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    List usermatch = await db.query('User',);
+    List usermatch = await db.query(
+      'User',
+    );
     print(usermatch);
   }
 
-// Future<void> isUser(String email,String password) async {
-//     final db = await database;
-//     await db!.
-//     // List usermatch = await db.query('User',);
-//     // print(usermatch);
-  // }
+  Future isUser(String email, String password) async {
+    bool status = false;
+    final db = await database;
+    await db!.query("User",
+        where: 'email=? AND password=?', whereArgs: [email, password]);
+    print("usermatch");
+    List usermatch = await db.query("User",
+        where: 'email=? AND password=?', whereArgs: [email, password]);
+    if (usermatch.length > 0) {
+      print("${usermatch[0].runtimeType}");
 
+       status = true;
 
+    } else {
+      print("User Not match");
+      status = false;
+    }
+    return status;
+  }
+
+  Future isUserGetData(String email, String password) async {
+    final db = await database;
+    await db!.query("User",
+        where: 'email=? AND password=?', whereArgs: [email, password]);
+    print("usermatch");
+    List usermatch = await db.query("User",
+        where: 'email=? AND password=?', whereArgs: [email, password]);
+  }
+}
+
+class Dog {
+  final int id;
+  final String name;
+  final int age;
+
+  Dog({
+    required this.id,
+    required this.name,
+    required this.age,
+  });
+
+  // Convert a Dog into a Map. The keys must correspond to the names of the
+  // columns in the database.
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'age': age,
+    };
+  }
+
+  // Implement toString to make it easier to see information about
+  // each dog when using the print statement.
+  @override
+  String toString() {
+    return 'Dog{id: $id, name: $name, age: $age}';
+  }
 }
